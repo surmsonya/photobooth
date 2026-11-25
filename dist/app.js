@@ -1,3 +1,4 @@
+import {finishPoster} from './poster.js';
 import {applyChrome} from './chrome.js';
 const $=s=>document.querySelector(s), video=$('#video'), screen=$('#screen'), ctx=screen.getContext('2d',{willReadFrequently:true}), effects=$('#effects');
 const W=960,H=572, names=['Оригинал','andrii','ellipsis','maarvs','Хром','Кислотный след','Линии','Рентген','Большие глаза'];
@@ -19,7 +20,7 @@ function draw(now){if(!running)return;requestAnimationFrame(draw);if(video.ready
  if((effect===0||effect===8||!effects.classList.contains('hidden'))&&faceModel&&now-lastFace>75&&!faceBusy&&video.currentTime!==lastTime){try{lastTime=video.currentTime;lastFace=now;face=faceModel.detectForVideo(video,now).faceLandmarks[0]||null}catch(e){console.warn(e)}}
  render(ctx,effect,now);if(!effects.classList.contains('hidden')&&now-lastPreview>500){lastPreview=now;updatePreviews(now)}}
 function updatePreviews(now){tiles.forEach((tile,i)=>{let c=tile.querySelector('canvas').getContext('2d');if(running&&i===effect)c.drawImage(screen,0,0,320,190);else{render(previewCtx,i,now,true);c.drawImage(previewCanvas,0,0,320,190)}})}
-function render(c,e,now,preview=false){c.clearRect(0,0,W,H);if(e>=1&&e<=3){cover(c,bgs[e-1],e===1?.85:.5);if(segment)c.drawImage(layer,0,0);else{c.globalAlpha=.5;c.drawImage(raw,0,0);c.globalAlpha=1}}else{c.drawImage(raw,0,0)}
+function render(c,e,now,preview=false){c.clearRect(0,0,W,H);if(e>=1&&e<=3){cover(c,bgs[e-1],e===1?.85:.5);if(segment)c.drawImage(layer,0,0);else{c.globalAlpha=.5;c.drawImage(raw,0,0);c.globalAlpha=1}finishPoster(c)}else{c.drawImage(raw,0,0)}
  if(e===0){let x=W*.5,y=H*.18,rx=W*.13,size=65;if(face){let p=face[10];x=(1-p.x)*W;y=Math.max(38,p.y*H-55);rx=Math.max(70,Math.abs(face[234].x-face[454].x)*W*.75);size=Math.max(45,Math.min(100,rx*.48))}if(logo.complete){for(let i=0;i<3;i++){let a=now*.00065+i*Math.PI*2/3,px=x+Math.cos(a)*rx,py=y+Math.sin(a)*rx*.24;c.save();c.translate(px,py);c.drawImage(logo,-size/2,-size/2,size,size);c.restore()}}}
  if(e===4) applyChrome(c);
  if(e===5&&preview){c.save();c.globalAlpha=.3;c.globalCompositeOperation='screen';c.filter='hue-rotate(130deg) saturate(4)';c.drawImage(raw,-25,0,W,H);c.restore()}
